@@ -2,7 +2,7 @@
 
 A calm, focused kanban-style task and productivity app built with plain HTML, CSS and JavaScript.
 
-**[🔗 Live Demo](https://productivity-app-hazim.netlify.app/)** · [Source code](https://github.com/hazell-lab/Haz-Focus) · [Portfolio](https://hazimaqil-portfolio.netlify.app)
+**[🔗 Live Demo](https://productivity-app-hazim.netlify.app/)** · [Source code](https://github.com/hazell-lab/haz-focus) · [Portfolio](https://hazimaqil-portfolio.netlify.app)
 
 ![HazFocus kanban board](docs/screenshot.png)
 
@@ -83,7 +83,7 @@ Haz-Focus/
 
 1. Clone this repository (or download it as a ZIP):
    ```bash
-   git clone https://github.com/hazell-lab/Haz-Focus.git
+   git clone https://github.com/hazell-lab/haz-focus.git
    ```
 2. Open the `Haz-Focus` folder in **VS Code**.
 3. Install the **Live Server** extension if you do not have it yet.
