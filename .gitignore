@@ -1,0 +1,5 @@
+backups/
+netlify-deploy/
+.vscode/
+.DS_Store
+Thumbs.db

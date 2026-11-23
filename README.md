@@ -1,0 +1,120 @@
+# HazFocus
+
+A calm, focused kanban-style task and productivity app built with plain HTML, CSS and JavaScript.
+
+**[🔗 Live Demo](https://productivity-app-hazim.netlify.app/)** · [Source code](https://github.com/hazell-lab/Haz-Focus) · [Portfolio](https://hazimaqil-portfolio.netlify.app)
+
+![HazFocus kanban board](docs/screenshot.png)
+
+## Description
+
+HazFocus helps you plan your work. You can create tasks, give them a category, priority and due date, and move them across a kanban board with drag and drop. The dashboard shows live statistics and a progress bar, and everything is saved in your browser with `localStorage`, so your tasks are still there after a refresh.
+
+This project was built to practice core frontend skills without any framework or library.
+
+## Features
+
+- **Task creation** with title, description, category, priority, due date and status
+- **Editing** tasks in the same modal, with the data already filled in
+- **Deleting** tasks with a custom confirmation modal
+- **Completion** with one click, plus a restore option
+- **Categories** (personal, study, work, coding, fitness) with live task counts
+- **Priorities** (low, medium, high) with colour indicators
+- **Due dates** with friendly formatting, plus due-today and overdue highlighting
+- **Kanban board** with To do, In progress and Completed columns
+- **Drag and drop** to move tasks between columns
+- **Filtering** by status, priority, category and due date
+- **Sorting** by newest, oldest, due date, priority or alphabetical order
+- **Search** by title, description or category
+- **Statistics** (total, completed, pending, overdue) and a progress bar
+- **Workspace dashboard** with an agenda (overdue, today and the next dated tasks grouped by day), area progress per category and a last 7 days chart of completed tasks and focus minutes, all from your own data
+- **Schedule view**: when sorted by due date, task lists are grouped under day headings
+- **Focus timer** (Pomodoro): 25 minute focus sessions, short breaks and a long break after every fourth session, with adjustable lengths, a soft chime, a "working on" task, today's focus time and a distraction-free mode
+- **Keyboard shortcuts**: `N` new task, `/` search, `1`–`6` switch views, `Space` start or pause the timer, `R` reset it, `F` hide distractions, `Esc` close or clear
+- **Views** for Dashboard, All tasks, Today, Upcoming and Completed
+- **localStorage** for tasks, filters, theme, name and the focus timer (a running timer survives a page reload)
+- Light and dark themes (cool slate with a teal accent), toast notifications, empty states
+- Responsive design with a bottom tab bar, swipeable board lanes and bottom-sheet dialogs on phones
+- Respects reduced-motion preferences
+
+## Design
+
+HazFocus uses one sans family (Inter) with weight and size for hierarchy, cool slate neutrals and a single calm teal accent (`#0f766e` in light, `#2dd4bf` in dark). Red is kept only for overdue and high-priority status. Cards and inputs use soft 10 to 16px corners, the board lanes are tinted surfaces and status chips are pills. All colour tokens live at the top of `css/style.css` and every text pair meets WCAG AA in both themes. Screenshots of the dashboard, board and focus view in both themes, at desktop and phone width, are in [`docs/slate-teal`](docs/slate-teal).
+
+## Technologies
+
+- HTML5
+- CSS3 (custom properties, grid, flexbox, media queries)
+- JavaScript (vanilla, ES6)
+- localStorage
+- Google Fonts (Inter) and an inline SVG icon sprite
+
+## JavaScript concepts demonstrated
+
+- **DOM manipulation:** building cards with template literals and updating the page
+- **Arrays and objects:** tasks are objects stored in an array
+- **Array methods:** `map`, `filter`, `find`, `reduce`, `sort`
+- **Event listeners:** clicks, input, change, submit and keyboard events, including event delegation
+- **Drag and drop:** the HTML drag and drop events (`dragstart`, `dragover`, `drop`, `dragend`)
+- **Date handling:** the `Date` object, friendly formatting, today, upcoming and overdue logic
+- **localStorage:** saving and loading data with `JSON.stringify` and `JSON.parse`
+- **Form validation:** custom error messages and `aria-invalid`
+
+## Folder structure
+
+```text
+Haz-Focus/
+├── index.html
+├── README.md
+├── LICENSE
+├── css/
+│   └── style.css
+├── js/
+│   └── script.js
+├── assets/
+│   └── icons/
+│       └── favicon.svg
+└── docs/
+    ├── screenshot.png
+    └── slate-teal/
+```
+
+## Setup
+
+1. Clone this repository (or download it as a ZIP):
+   ```bash
+   git clone https://github.com/hazell-lab/Haz-Focus.git
+   ```
+2. Open the `Haz-Focus` folder in **VS Code**.
+3. Install the **Live Server** extension if you do not have it yet.
+4. Right-click `index.html` and choose **Open with Live Server**.
+5. The app opens in your browser at `http://127.0.0.1:5500`.
+
+You can also open `index.html` directly in a browser. An internet connection is needed for the Google Fonts (the app falls back to system fonts without it).
+
+## Notes
+
+- Sample tasks appear only the first time you open the app. After that, your own saved tasks are used.
+- Drag and drop works with a mouse, and on touch screens with a long press on a card. The status dropdown on each card also moves tasks.
+- Your name for the greeting can be changed in **Settings**.
+- To reset everything, clear the site data in your browser or use **Settings**.
+
+## Future improvements
+
+- User authentication
+- Firebase or a backend database
+- Cloud synchronization
+- Recurring tasks
+- Reminders and notifications
+- Month calendar view
+- Subtasks
+- Team collaboration
+- A React version of the project
+
+## Author
+
+Built by **Hazim Aqil**, Software Engineering student at the German-Malaysian Institute (GMI).
+
+- Portfolio: [hazimaqil-portfolio.netlify.app](https://hazimaqil-portfolio.netlify.app)
+- GitHub: [@hazell-lab](https://github.com/hazell-lab)
+- LinkedIn: [mdhazimaqil](https://www.linkedin.com/in/mdhazimaqil/)

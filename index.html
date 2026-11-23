@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="HazFocus is a calm kanban style task and productivity app built with html, css and javascript.">
+  <meta name="theme-color" content="#f8fafc" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)">
+  <title>Dashboard | HazFocus</title>
+
+  <!-- favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+
+  <!-- google fonts: inter for the whole interface -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- main styles -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- set the theme early so the page does not flash white in dark mode -->
+  <script>
+    try {
+      var savedTheme = localStorage.getItem("HazFocus-theme");
+      if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+
+  <!-- icon sprite -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-mark" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="2.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-dashboard" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M9.5 4v16M9.5 11h11"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9.5 6.5h10.5M9.5 12h10.5M9.5 17.5h10.5"/><path d="M4 6.5l1 1 1.8-2M4 12l1 1 1.8-2M4 17.5l1 1 1.8-2"/></symbol>
+    <symbol id="i-today" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><circle cx="12" cy="14.5" r="1.6" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-upcoming" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.2l2.3 2.3 4.7-4.8"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7.5h9M18 7.5h2M4 16.5h3M11 16.5h9"/><circle cx="15.5" cy="7.5" r="2.2"/><circle cx="9" cy="16.5" r="2.2"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.5A7.5 7.5 0 0 1 9.5 4.5a7.5 7.5 0 1 0 10 10z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.8"/><path d="M12 2.8v2M12 19.2v2M2.8 12h2M19.2 12h2M5.5 5.5l1.4 1.4M17.1 17.1l1.4 1.4M5.5 18.5l1.4-1.4M17.1 6.9l1.4-1.4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5.5 12.5l4 4 9-9"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4.5 19.5h4l10-10-4-4-10 10z"/><path d="M13 7l4 4"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M10 4h4M6.5 7l.9 12.5h9.2L17.5 7"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6.5h16M7 12h10M10 17.5h4"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4.5v3.5H8"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.8v4.8M12 16h.01"/></symbol>
+    <symbol id="i-focus" viewBox="0 0 24 24"><circle cx="12" cy="13.5" r="7.5"/><path d="M12 10v3.5l2.2 1.6M9.8 2.8h4.4M12 2.8V6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.8v12.4a.6.6 0 0 0 .9.5l9.6-6.2a.6.6 0 0 0 0-1L8.9 5.3a.6.6 0 0 0-.9.5z" fill="currentColor"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.8" y="5.5" width="3.6" height="13" rx="1" fill="currentColor"/><rect x="13.6" y="5.5" width="3.6" height="13" rx="1" fill="currentColor"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 24 24"><path d="M6 6.5l8.5 5.5L6 17.5z"/><path d="M18 6v12"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4.5 9V4.5H9M19.5 9V4.5H15M4.5 15v4.5H9M19.5 15v4.5H15"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  </svg>
+
+  <a class="skip-link" href="#content">Skip to content</a>
+
+  <div class="app">
+
+    <!-- dark overlay for mobile menu -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="sidebar">
+      <div class="logo">
+        <svg class="logo-mark" aria-hidden="true"><use href="#i-mark"/></svg>
+        <span class="logo-text">HazFocus</span>
+      </div>
+
+      <nav class="nav" aria-label="main navigation">
+        <button type="button" class="nav-item active" data-view="dashboard">
+          <svg class="icon" aria-hidden="true"><use href="#i-dashboard"/></svg>
+          <span class="nav-label">Dashboard</span>
+          <kbd class="nav-key" aria-hidden="true">1</kbd>
+        </button>
+        <button type="button" class="nav-item" data-view="all">
+          <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>
+          <span class="nav-label">All tasks</span>
+          <span class="nav-count" id="nav-count-all">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="today">
+          <svg class="icon" aria-hidden="true"><use href="#i-today"/></svg>
+          <span class="nav-label">Today</span>
+          <span class="nav-count" id="nav-count-today">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="upcoming">
+          <svg class="icon" aria-hidden="true"><use href="#i-upcoming"/></svg>
+          <span class="nav-label">Upcoming</span>
+          <span class="nav-count" id="nav-count-upcoming">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="completed">
+          <svg class="icon" aria-hidden="true"><use href="#i-done"/></svg>
+          <span class="nav-label">Completed</span>
+          <span class="nav-count" id="nav-count-completed">0</span>
+        </button>
+        <button type="button" class="nav-item" data-view="focus">
+          <svg class="icon" aria-hidden="true"><use href="#i-focus"/></svg>
+          <span class="nav-label">Focus</span>
+          <span class="nav-timer" id="nav-timer" hidden></span>
+        </button>
+      </nav>
+
+      <!-- categories -->
+      <div class="sidebar-section">
+        <p class="sidebar-heading">Categories</p>
+        <div class="category-list">
+          <button type="button" class="category-item" data-category="personal">
+            <span class="category-dot dot-personal"></span>
+            <span class="nav-label">Personal</span>
+            <span class="nav-count" data-category-count="personal">0</span>
+          </button>
+          <button type="button" class="category-item" data-category="study">
+            <span class="category-dot dot-study"></span>
+            <span class="nav-label">Study</span>
+            <span class="nav-count" data-category-count="study">0</span>
+          </button>
+          <button type="button" class="category-item" data-category="work">
+            <span class="category-dot dot-work"></span>
+            <span class="nav-label">Work</span>
+            <span class="nav-count" data-category-count="work">0</span>
+          </button>
+          <button type="button" class="category-item" data-category="coding">
+            <span class="category-dot dot-coding"></span>
+            <span class="nav-label">Coding</span>
+            <span class="nav-count" data-category-count="coding">0</span>
+          </button>
+          <button type="button" class="category-item" data-category="fitness">
+            <span class="category-dot dot-fitness"></span>
+            <span class="nav-label">Fitness</span>
+            <span class="nav-count" data-category-count="fitness">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- settings and profile -->
+      <div class="sidebar-bottom">
+        <button type="button" class="nav-item" data-view="settings">
+          <svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg>
+          <span class="nav-label">Settings</span>
+        </button>
+        <div class="profile">
+          <span class="avatar" id="profile-avatar" aria-hidden="true">HA</span>
+          <span class="profile-name" id="profile-name">Hazim Aqil</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- main area -->
+    <div class="main">
+
+      <!-- header -->
+      <header class="header">
+        <div class="header-left">
+          <button type="button" class="icon-btn menu-btn" id="menu-btn" aria-label="open menu" aria-controls="sidebar" aria-expanded="false">
+            <svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg>
+          </button>
+          <div class="title-block">
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+            <p class="page-subtitle" id="current-date"></p>
+          </div>
+        </div>
+
+        <div class="search-box">
+          <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+          <input type="search" id="search-input" placeholder="Search tasks" aria-label="search tasks" aria-keyshortcuts="/" autocomplete="off">
+          <kbd class="search-key" aria-hidden="true">/</kbd>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="icon-btn" id="theme-btn" aria-label="switch to dark theme">
+            <svg class="icon" aria-hidden="true"><use id="theme-icon" href="#i-moon"/></svg>
+          </button>
+          <button type="button" class="btn btn-primary" id="add-task-btn" aria-label="add task" aria-keyshortcuts="n" title="New task (N)">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+            <span class="btn-text">New task</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- page content -->
+      <main class="content" id="content" tabindex="-1">
+
+        <!-- dashboard overview -->
+        <section class="dashboard" id="dashboard-section" aria-label="dashboard overview">
+          <div class="hero">
+            <h2 class="hero-title"><span id="greeting-text"></span><span class="hero-name" id="hero-name">, Hazim.</span></h2>
+            <p class="hero-lede" id="productivity-message"></p>
+          </div>
+
+          <div class="overview-grid">
+            <!-- agenda for the next seven days -->
+            <div class="agenda-col">
+              <div class="section-head">
+                <h2 class="section-title">Agenda</h2>
+                <button type="button" class="link-btn" data-goto="upcoming">
+                  All upcoming
+                  <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg>
+                </button>
+              </div>
+              <div class="agenda" id="agenda"></div>
+            </div>
+
+            <!-- numbers, areas and the week -->
+            <div class="overview-stats">
+              <dl class="stats">
+                <div class="stat">
+                  <dt>Open</dt>
+                  <dd id="stat-pending">0</dd>
+                </div>
+                <div class="stat">
+                  <dt>Due today</dt>
+                  <dd id="stat-today">0</dd>
+                </div>
+                <div class="stat stat-overdue" id="stat-overdue-wrap">
+                  <dt>Overdue</dt>
+                  <dd id="stat-overdue">0</dd>
+                </div>
+                <div class="stat">
+                  <dt>Done</dt>
+                  <dd id="stat-completed">0</dd>
+                </div>
+              </dl>
+
+              <div class="progress">
+                <div class="progress-info">
+                  <p class="progress-text" id="progress-text">0 of 0 tasks completed</p>
+                  <p class="progress-percent" id="progress-percent">0%</p>
+                </div>
+                <div class="progress-bar" id="progress-bar" role="progressbar" aria-label="task completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                  <div class="progress-fill" id="progress-fill"></div>
+                </div>
+              </div>
+
+              <!-- progress per category -->
+              <div class="areas" id="areas-block">
+                <h2 class="section-title">Areas</h2>
+                <ul class="area-list" id="area-list"></ul>
+              </div>
+
+              <!-- the last seven days -->
+              <div class="week">
+                <div class="section-head">
+                  <h2 class="section-title">Last 7 days</h2>
+                  <p class="week-summary" id="week-summary"></p>
+                </div>
+                <p class="week-caption">Tasks completed per day</p>
+                <div class="week-chart" id="week-chart"></div>
+                <table class="visually-hidden" id="week-table">
+                  <caption>Tasks completed and minutes focused in the last 7 days</caption>
+                  <thead><tr><th scope="col">Day</th><th scope="col">Tasks completed</th><th scope="col">Minutes focused</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- summary when one category is open -->
+        <section class="area-summary" id="area-summary" aria-label="category summary" hidden></section>
+
+        <!-- filters and sorting -->
+        <section class="toolbar" id="toolbar" aria-label="filters and sorting">
+          <div class="toolbar-bar">
+            <h2 class="section-title toolbar-title" id="toolbar-title">Board</h2>
+            <button type="button" class="chip-btn filter-toggle" id="filter-toggle" aria-expanded="false" aria-controls="filters-panel">
+              <svg class="icon" aria-hidden="true"><use href="#i-filter"/></svg>
+              <span>Filters</span>
+              <span class="filter-badge" id="filter-badge" hidden>0</span>
+            </button>
+          </div>
+
+          <div class="filters" id="filters-panel">
+            <div class="filter-group">
+              <label for="filter-status">Status</label>
+              <select id="filter-status">
+                <option value="all">All</option>
+                <option value="todo">To do</option>
+                <option value="inprogress">In progress</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-priority">Priority</label>
+              <select id="filter-priority">
+                <option value="all">All</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-category">Category</label>
+              <select id="filter-category">
+                <option value="all">All</option>
+                <option value="personal">Personal</option>
+                <option value="study">Study</option>
+                <option value="work">Work</option>
+                <option value="coding">Coding</option>
+                <option value="fitness">Fitness</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="filter-due">Due</label>
+              <select id="filter-due">
+                <option value="all">All</option>
+                <option value="today">Today</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="overdue">Overdue</option>
+              </select>
+            </div>
+            <div class="filter-group">
+              <label for="sort-select">Sort</label>
+              <select id="sort-select">
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="due">Due date</option>
+                <option value="priority">Priority</option>
+                <option value="alphabetical">A to Z</option>
+              </select>
+            </div>
+            <button type="button" class="chip-btn" id="clear-filters-btn">
+              <svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg>
+              <span>Clear</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- kanban board -->
+        <section class="board" id="board-view" aria-label="kanban board">
+          <div class="column" data-column="todo">
+            <div class="column-header">
+              <h2 class="column-title"><span class="column-dot dot-todo"></span>To do</h2>
+              <span class="column-count" id="column-count-todo">0</span>
+            </div>
+            <div class="task-list" id="list-todo" data-status="todo"></div>
+          </div>
+
+          <div class="column" data-column="inprogress">
+            <div class="column-header">
+              <h2 class="column-title"><span class="column-dot dot-inprogress"></span>In progress</h2>
+              <span class="column-count" id="column-count-inprogress">0</span>
+            </div>
+            <div class="task-list" id="list-inprogress" data-status="inprogress"></div>
+          </div>
+
+          <div class="column" data-column="completed">
+            <div class="column-header">
+              <h2 class="column-title"><span class="column-dot dot-completed"></span>Completed</h2>
+              <span class="column-count" id="column-count-completed">0</span>
+            </div>
+            <div class="task-list" id="list-completed" data-status="completed"></div>
+          </div>
+        </section>
+
+        <!-- list view for today, upcoming and completed -->
+        <section id="task-list-view" aria-label="task list" hidden>
+          <div class="task-grid" id="task-grid"></div>
+        </section>
+
+        <!-- empty state -->
+        <div class="empty-state" id="empty-state" hidden>
+          <svg class="empty-mark" aria-hidden="true"><use href="#i-mark"/></svg>
+          <p class="empty-text" id="empty-text">No tasks yet. Create your first task.</p>
+          <button type="button" class="btn btn-primary" id="empty-add-btn">
+            <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+            <span>New task</span>
+          </button>
+        </div>
+
+        <!-- focus timer -->
+        <section class="focus-view" id="focus-view" aria-label="focus timer" hidden>
+          <div class="mode-switch" role="radiogroup" aria-label="timer mode">
+            <button type="button" class="mode-btn" role="radio" data-mode="focus" aria-checked="true">Focus</button>
+            <button type="button" class="mode-btn" role="radio" data-mode="short" aria-checked="false">Short break</button>
+            <button type="button" class="mode-btn" role="radio" data-mode="long" aria-checked="false">Long break</button>
+          </div>
+
+          <div class="timer">
+            <svg class="timer-ring" viewBox="0 0 240 240" aria-hidden="true">
+              <circle class="ring-track" cx="120" cy="120" r="112"/>
+              <circle class="ring-progress" id="ring-progress" cx="120" cy="120" r="112"/>
+            </svg>
+            <div class="timer-center">
+              <p class="timer-time" id="timer-time" role="timer" aria-label="time left">25:00</p>
+              <p class="timer-label" id="timer-label">Focus</p>
+              <ol class="cycle-dots" id="cycle-dots" aria-label="focus sessions in this cycle"></ol>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button type="button" class="icon-btn icon-btn-round" id="timer-reset" aria-label="reset timer" title="Reset (R)">
+              <svg class="icon" aria-hidden="true"><use href="#i-reset"/></svg>
+            </button>
+            <button type="button" class="timer-toggle" id="timer-toggle" aria-keyshortcuts="Space">
+              <svg class="icon" aria-hidden="true"><use id="timer-toggle-icon" href="#i-play"/></svg>
+              <span id="timer-toggle-text">Start</span>
+            </button>
+            <button type="button" class="icon-btn icon-btn-round" id="timer-skip" aria-label="skip to next session" title="Skip">
+              <svg class="icon" aria-hidden="true"><use href="#i-skip"/></svg>
+            </button>
+          </div>
+
+          <div class="focus-task">
+            <label for="focus-task-select">Working on</label>
+            <div class="focus-task-row">
+              <select id="focus-task-select"></select>
+              <button type="button" class="chip-btn" id="focus-task-done" hidden>
+                <svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>
+                <span>Mark done</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="focus-foot">
+            <p class="focus-today" id="focus-today"></p>
+            <button type="button" class="chip-btn" id="immersive-btn" aria-pressed="false" title="Hide everything else (F)">
+              <svg class="icon" aria-hidden="true"><use href="#i-expand"/></svg>
+              <span id="immersive-text">Hide distractions</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- settings -->
+        <section class="settings" id="settings-view" aria-label="settings" hidden>
+          <div class="settings-group">
+            <h2 class="settings-heading">Profile</h2>
+            <form class="setting-row" id="name-form" novalidate>
+              <div>
+                <label class="setting-title" for="name-input">Your name</label>
+                <p class="setting-desc" id="name-desc">Used in the greeting and the sidebar. Leave empty to hide it.</p>
+              </div>
+              <div class="name-field">
+                <input type="text" id="name-input" maxlength="40" autocomplete="name" aria-describedby="name-desc" placeholder="Your name">
+                <button type="submit" class="btn btn-ghost">Save</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="settings-group">
+            <h2 class="settings-heading">Appearance</h2>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Dark mode</p>
+                <p class="setting-desc">Switch between the day and night themes.</p>
+              </div>
+              <button type="button" class="switch" id="theme-switch" role="switch" aria-checked="false" aria-label="toggle dark mode">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h2 class="settings-heading">Focus timer</h2>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Session lengths</p>
+                <p class="setting-desc">Minutes for focus, short breaks and long breaks. A long break comes after every fourth focus session.</p>
+              </div>
+              <div class="duration-fields">
+                <label class="duration"><span>Focus</span><input type="number" id="focus-minutes" min="1" max="120" inputmode="numeric"></label>
+                <label class="duration"><span>Short</span><input type="number" id="short-minutes" min="1" max="60" inputmode="numeric"></label>
+                <label class="duration"><span>Long</span><input type="number" id="long-minutes" min="1" max="60" inputmode="numeric"></label>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Sound</p>
+                <p class="setting-desc">Play a soft chime when a session ends.</p>
+              </div>
+              <button type="button" class="switch on" id="sound-switch" role="switch" aria-checked="true" aria-label="chime when a session ends">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h2 class="settings-heading">Data</h2>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Load sample tasks</p>
+                <p class="setting-desc">Replace your tasks with the sample tasks.</p>
+              </div>
+              <button type="button" class="btn btn-ghost" id="reset-samples-btn">Load samples</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Delete all tasks</p>
+                <p class="setting-desc">Remove every task from this browser. This cannot be undone.</p>
+              </div>
+              <button type="button" class="btn btn-danger" id="delete-all-btn">Delete all</button>
+            </div>
+          </div>
+
+          <div class="settings-group">
+            <h2 class="settings-heading">Keyboard shortcuts</h2>
+            <dl class="shortcuts">
+              <div><dt><kbd>N</kbd></dt><dd>New task</dd></div>
+              <div><dt><kbd>/</kbd></dt><dd>Search tasks</dd></div>
+              <div><dt><kbd>1</kbd> – <kbd>6</kbd></dt><dd>Dashboard, All tasks, Today, Upcoming, Completed, Focus</dd></div>
+              <div><dt><kbd>Space</kbd></dt><dd>Start or pause the focus timer</dd></div>
+              <div><dt><kbd>R</kbd> <kbd>F</kbd></dt><dd>Reset the timer, hide distractions</dd></div>
+              <div><dt><kbd>Esc</kbd></dt><dd>Close menu or dialog, clear search, leave distraction-free mode</dd></div>
+            </dl>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- footer -->
+      <footer class="footer">
+        <p>HazFocus &middot; made by Hazim Aqil</p>
+        <p>
+          <a href="https://github.com/hazell-lab/" target="_blank" rel="noopener">GitHub</a>
+          <span aria-hidden="true">&middot;</span>
+          <a href="https://hazimaqil-portfolio.netlify.app" target="_blank" rel="noopener">Portfolio</a>
+        </p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- mobile bottom navigation -->
+  <nav class="tabbar" aria-label="quick navigation">
+    <button type="button" class="nav-item tab" data-view="dashboard">
+      <svg class="icon" aria-hidden="true"><use href="#i-dashboard"/></svg>
+      <span class="nav-label">Home</span>
+    </button>
+    <button type="button" class="nav-item tab" data-view="today">
+      <svg class="icon" aria-hidden="true"><use href="#i-today"/></svg>
+      <span class="nav-label">Today</span>
+    </button>
+    <button type="button" class="tab-add" id="mobile-add-btn" aria-label="add task">
+      <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
+    </button>
+    <button type="button" class="nav-item tab" data-view="focus">
+      <svg class="icon" aria-hidden="true"><use href="#i-focus"/></svg>
+      <span class="nav-label">Focus</span>
+    </button>
+    <button type="button" class="nav-item tab" data-view="all">
+      <svg class="icon" aria-hidden="true"><use href="#i-list"/></svg>
+      <span class="nav-label">All</span>
+    </button>
+  </nav>
+
+  <!-- add and edit task modal -->
+  <dialog class="modal" id="task-modal" aria-labelledby="task-modal-title">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="task-modal-title">New task</h2>
+        <button type="button" class="icon-btn icon-btn-plain" id="close-modal-btn" aria-label="close">
+          <svg class="icon" aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+
+      <form id="task-form" novalidate>
+        <div class="form-group">
+          <label for="task-title">Title <span class="required" aria-hidden="true">*</span></label>
+          <input type="text" id="task-title" class="input-title" maxlength="80" placeholder="What needs doing?" aria-describedby="title-error" aria-required="true" autocomplete="off">
+          <p class="error-message" id="title-error"></p>
+        </div>
+
+        <div class="form-group">
+          <label for="task-description">Notes</label>
+          <textarea id="task-description" maxlength="200" placeholder="Optional details"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-category">Category</label>
+            <select id="task-category">
+              <option value="personal" selected>Personal</option>
+              <option value="study">Study</option>
+              <option value="work">Work</option>
+              <option value="coding">Coding</option>
+              <option value="fitness">Fitness</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="task-priority">Priority</label>
+            <select id="task-priority">
+              <option value="low">Low</option>
+              <option value="medium" selected>Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-due">Due date</label>
+            <input type="date" id="task-due" aria-describedby="due-error">
+            <p class="error-message" id="due-error"></p>
+          </div>
+          <div class="form-group">
+            <label for="task-status">Status</label>
+            <select id="task-status">
+              <option value="todo" selected>To do</option>
+              <option value="inprogress">In progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="cancel-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="submit-btn">Add task</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- confirm modal -->
+  <dialog class="modal modal-small" id="confirm-modal" aria-labelledby="confirm-title">
+    <div class="modal-box">
+      <h2 id="confirm-title">Are you sure?</h2>
+      <p class="confirm-message" id="confirm-message"></p>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="confirm-cancel-btn">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-ok-btn">Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- toast messages -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
