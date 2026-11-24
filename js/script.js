@@ -119,6 +119,9 @@ const settingsView = document.getElementById("settings-view");
 const themeSwitch = document.getElementById("theme-switch");
 const resetSamplesBtn = document.getElementById("reset-samples-btn");
 const deleteAllBtn = document.getElementById("delete-all-btn");
+const exportBtn = document.getElementById("export-btn");
+const importBtn = document.getElementById("import-btn");
+const importInput = document.getElementById("import-input");
 const nameForm = document.getElementById("name-form");
 const nameInput = document.getElementById("name-input");
 const heroName = document.getElementById("hero-name");
@@ -2127,6 +2130,13 @@ function setupEventListeners() {
     });
   });
 
+  // backup
+  exportBtn.addEventListener("click", downloadBackup);
+  importBtn.addEventListener("click", function () {
+    importInput.click();
+  });
+  importInput.addEventListener("change", handleBackupFile);
+
   // profile name
   nameForm.addEventListener("submit", handleNameSubmit);
 
@@ -2226,6 +2236,171 @@ function readJson(key) {
   } catch (error) {
     return null;
   }
+}
+
+// backup
+
+const BACKUP_VERSION = 1;
+const BACKUP_MAX_BYTES = 5 * 1024 * 1024;
+const BACKUP_MAX_TASKS = 5000;
+
+// everything worth keeping, not filters or a running timer
+function buildBackup() {
+  return {
+    app: "HazFocus",
+    version: BACKUP_VERSION,
+    exportedAt: new Date().toISOString(),
+    tasks: tasks,
+    name: getUserName(),
+    theme: document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light",
+    focusSettings: focusSettings,
+    focusHistory: getFocusHistory()
+  };
+}
+
+// save the backup as a json file
+function downloadBackup() {
+  const json = JSON.stringify(buildBackup(), null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "hazfocus-backup-" + getTodayString() + ".json";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(function () {
+    URL.revokeObjectURL(link.href);
+  }, 1000);
+  showToast("Backup downloaded");
+}
+
+// check a parsed file, returns a clean backup or an error message
+function readBackup(data) {
+  if (!data || typeof data !== "object" || data.app !== "HazFocus" || !Array.isArray(data.tasks)) {
+    return { error: "This is not a HazFocus backup file." };
+  }
+  if (Number(data.version) > BACKUP_VERSION) {
+    return { error: "This backup is from a newer version of HazFocus." };
+  }
+  if (data.tasks.length > BACKUP_MAX_TASKS) {
+    return { error: "This backup has too many tasks to restore." };
+  }
+
+  const cleanTasks = data.tasks
+    .filter(function (task) {
+      return task && typeof task === "object";
+    })
+    .map(normalizeTask);
+
+  // give tasks with the same id a new one, so edits do not hit two tasks
+  const seen = new Set();
+  cleanTasks.forEach(function (task, index) {
+    while (seen.has(task.id)) {
+      task.id = Date.now() + index + seen.size;
+    }
+    seen.add(task.id);
+  });
+
+  const settings = data.focusSettings && typeof data.focusSettings === "object" ? data.focusSettings : {};
+  const history = {};
+  if (data.focusHistory && typeof data.focusHistory === "object" && !Array.isArray(data.focusHistory)) {
+    Object.keys(data.focusHistory).forEach(function (key) {
+      const minutes = Number(data.focusHistory[key]);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(key) && minutes > 0) {
+        history[key] = Math.round(minutes);
+      }
+    });
+  }
+
+  const exported = new Date(data.exportedAt);
+
+  return {
+    tasks: cleanTasks,
+    name: typeof data.name === "string" ? data.name.trim().replace(/\s+/g, " ").slice(0, 40) : null,
+    theme: data.theme === "dark" || data.theme === "light" ? data.theme : null,
+    focusSettings: {
+      focus: clampMinutes(settings.focus, 120, 25),
+      short: clampMinutes(settings.short, 60, 5),
+      long: clampMinutes(settings.long, 60, 15),
+      sound: settings.sound !== false
+    },
+    focusHistory: history,
+    exportedAt: isNaN(exported) ? "" : exported.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
+  };
+}
+
+// read the chosen file and ask before replacing anything
+function handleBackupFile() {
+  const file = importInput.files[0];
+  // clear it so choosing the same file again still fires change
+  importInput.value = "";
+  if (!file) {
+    return;
+  }
+  if (file.size > BACKUP_MAX_BYTES) {
+    showToast("That file is too large to be a HazFocus backup.", "error");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function () {
+    let data;
+    try {
+      data = JSON.parse(reader.result);
+    } catch (error) {
+      showToast("That file could not be read as a backup.", "error");
+      return;
+    }
+
+    const backup = readBackup(data);
+    if (backup.error) {
+      showToast(backup.error, "error");
+      return;
+    }
+
+    const from = backup.exportedAt ? " from " + backup.exportedAt : "";
+    const message = `Replace your ${plural(tasks.length, "task")} with the ${plural(backup.tasks.length, "task")} in this backup${from}? Your name, theme and focus timer settings and history will be replaced too.`;
+    openConfirm("Restore backup", message, "Restore", function () {
+      restoreBackup(backup);
+    }, false);
+  };
+  reader.onerror = function () {
+    showToast("That file could not be read as a backup.", "error");
+  };
+  reader.readAsText(file);
+}
+
+// put a checked backup in place
+function restoreBackup(backup) {
+  tasks = backup.tasks;
+  saveTasks();
+
+  if (backup.name !== null) {
+    writeStorage(NAME_KEY, backup.name);
+  }
+  showUserName();
+
+  if (backup.theme) {
+    writeStorage(THEME_KEY, backup.theme);
+    applyTheme(backup.theme);
+  }
+
+  focusSettings = backup.focusSettings;
+  saveFocusSettings();
+  writeStorage(FOCUS_HISTORY_KEY, JSON.stringify(backup.focusHistory));
+  if (focusState.status === "idle") {
+    focusState.remaining = getModeLength(focusState.mode);
+  }
+  // the working-on task may not exist in the backup
+  if (focusState.taskId !== null && !tasks.some(function (task) { return task.id === focusState.taskId; })) {
+    focusState.taskId = null;
+  }
+  saveFocus();
+  syncFocusSettingControls();
+  updateTimerDisplay();
+
+  renderApp();
+  showToast("Backup restored");
 }
 
 function loadFocus() {

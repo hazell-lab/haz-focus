@@ -33,6 +33,7 @@ This project was built to practice core frontend skills without any framework or
 - **Keyboard shortcuts**: `N` new task, `/` search, `1`–`6` switch views, `Space` start or pause the timer, `R` reset it, `F` hide distractions, `Esc` close or clear
 - **Views** for Dashboard, All tasks, Today, Upcoming and Completed
 - **localStorage** for tasks, filters, theme, name and the focus timer (a running timer survives a page reload)
+- **Backup and restore**: download your tasks, name, theme and focus settings and history as a JSON file from **Settings**, and restore it in any browser. Files are checked and cleaned before anything is replaced, and you confirm first
 - Light and dark themes (cool slate with a teal accent), toast notifications, empty states
 - Responsive design with a bottom tab bar, swipeable board lanes and bottom-sheet dialogs on phones
 - Respects reduced-motion preferences
@@ -97,6 +98,7 @@ You can also open `index.html` directly in a browser. An internet connection is 
 - Sample tasks appear only the first time you open the app. After that, your own saved tasks are used.
 - Drag and drop works with a mouse, and on touch screens with a long press on a card. The status dropdown on each card also moves tasks.
 - Your name for the greeting can be changed in **Settings**.
+- Your data lives only in this browser. Use **Settings → Download backup** to keep a copy or move it to another device.
 - To reset everything, clear the site data in your browser or use **Settings**.
 
 ## Future improvements

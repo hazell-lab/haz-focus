@@ -485,6 +485,21 @@
             <h2 class="settings-heading">Data</h2>
             <div class="setting-row">
               <div>
+                <p class="setting-title">Back up your data</p>
+                <p class="setting-desc">Download your tasks, name, theme and focus timer settings and history as a file.</p>
+              </div>
+              <button type="button" class="btn btn-ghost" id="export-btn">Download backup</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Restore from a backup</p>
+                <p class="setting-desc">Replace everything in this browser with a HazFocus backup file.</p>
+              </div>
+              <button type="button" class="btn btn-ghost" id="import-btn">Restore backup</button>
+              <input type="file" id="import-input" accept=".json,application/json" hidden>
+            </div>
+            <div class="setting-row">
+              <div>
                 <p class="setting-title">Load sample tasks</p>
                 <p class="setting-desc">Replace your tasks with the sample tasks.</p>
               </div>
@@ -493,7 +508,7 @@
             <div class="setting-row">
               <div>
                 <p class="setting-title">Delete all tasks</p>
-                <p class="setting-desc">Remove every task from this browser. This cannot be undone.</p>
+                <p class="setting-desc">Remove every task from this browser. This cannot be undone, so download a backup first.</p>
               </div>
               <button type="button" class="btn btn-danger" id="delete-all-btn">Delete all</button>
             </div>
