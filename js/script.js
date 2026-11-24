@@ -379,8 +379,29 @@ function getSampleTasks() {
       dueDate: addDays(-1),
       status: "todo",
       createdAt: today
-    }
+    },
+    // finished earlier this week, so the last 7 days chart is not empty on a first visit
+    sampleDone(now + 6, "Submit networking lab report", "study", "medium", -1),
+    sampleDone(now + 7, "Fix navbar on mobile", "coding", "medium", -3),
+    sampleDone(now + 8, "Morning run", "fitness", "low", -3),
+    sampleDone(now + 9, "Email internship coordinator", "work", "high", -5),
+    sampleDone(now + 10, "Read operating systems chapter 4", "study", "low", -6)
   ];
+}
+
+// a sample task that was completed a few days ago
+function sampleDone(id, title, category, priority, daysAgo) {
+  return {
+    id: id,
+    title: title,
+    description: "",
+    category: category,
+    priority: priority,
+    dueDate: addDays(daysAgo),
+    status: "completed",
+    createdAt: addDays(daysAgo - 2),
+    completedAt: addDays(daysAgo)
+  };
 }
 
 // read from localstorage safely (it can be blocked in private mode)
@@ -1057,10 +1078,11 @@ function shortDayDate(dateString) {
 function agendaRow(task) {
   return `
     <li>
-      <button type="button" class="focus-row" data-action="edit" data-id="${task.id}" aria-label="Open task: ${escapeHtml(task.title)}">
+      <button type="button" class="focus-row" data-action="edit" data-id="${task.id}">
         <span class="meta prio-${task.priority}" title="${capitalize(task.priority)} priority"><span class="prio-bars" aria-hidden="true"><i></i><i></i><i></i></span></span>
         <span class="focus-title">${escapeHtml(task.title)}</span>
         <span class="agenda-cat"><span class="category-dot dot-${task.category}"></span>${capitalize(task.category)}</span>
+        <span class="visually-hidden">, ${task.priority} priority</span>
       </button>
     </li>
   `;
@@ -1142,9 +1164,9 @@ function renderAreas() {
       const percent = Math.round((row.done / row.total) * 100);
       return `
         <li>
-          <button type="button" class="area-row" data-area="${row.category}" aria-label="${capitalize(row.category)}: ${row.done} of ${row.total} done">
+          <button type="button" class="area-row" data-area="${row.category}">
             <span class="area-name"><span class="category-dot dot-${row.category}"></span>${capitalize(row.category)}</span>
-            <span class="area-count">${row.done}/${row.total}</span>
+            <span class="area-count"><span aria-hidden="true">${row.done}/${row.total}</span><span class="visually-hidden">${row.done} of ${row.total} done</span></span>
             <span class="area-bar" aria-hidden="true"><span class="area-fill dot-${row.category}" style="width: ${percent}%"></span></span>
           </button>
         </li>
@@ -2169,12 +2191,13 @@ const focusMinutesInput = document.getElementById("focus-minutes");
 const shortMinutesInput = document.getElementById("short-minutes");
 const longMinutesInput = document.getElementById("long-minutes");
 const soundSwitch = document.getElementById("sound-switch");
+const notifySwitch = document.getElementById("notify-switch");
 
 const SESSIONS_PER_CYCLE = 4;
 const RING_LENGTH = 2 * Math.PI * 112;
 const modeLabels = { focus: "Focus", short: "Short break", long: "Long break" };
 
-let focusSettings = { focus: 25, short: 5, long: 15, sound: true };
+let focusSettings = { focus: 25, short: 5, long: 15, sound: true, notify: false };
 let focusState = {
   mode: "focus",
   status: "idle", // idle, running or paused
@@ -2322,7 +2345,8 @@ function readBackup(data) {
       focus: clampMinutes(settings.focus, 120, 25),
       short: clampMinutes(settings.short, 60, 5),
       long: clampMinutes(settings.long, 60, 15),
-      sound: settings.sound !== false
+      sound: settings.sound !== false,
+      notify: settings.notify === true
     },
     focusHistory: history,
     exportedAt: isNaN(exported) ? "" : exported.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })
@@ -2410,7 +2434,8 @@ function loadFocus() {
       focus: clampMinutes(settings.focus, 120, 25),
       short: clampMinutes(settings.short, 60, 5),
       long: clampMinutes(settings.long, 60, 15),
-      sound: settings.sound !== false
+      sound: settings.sound !== false,
+      notify: settings.notify === true
     };
   }
 
@@ -2501,6 +2526,10 @@ function syncFocusSettingControls() {
   longMinutesInput.value = focusSettings.long;
   soundSwitch.classList.toggle("on", focusSettings.sound);
   soundSwitch.setAttribute("aria-checked", String(focusSettings.sound));
+  // off if the browser blocks it, even when it was turned on before
+  const notifyOn = focusSettings.notify && canNotify();
+  notifySwitch.classList.toggle("on", notifyOn);
+  notifySwitch.setAttribute("aria-checked", String(notifyOn));
 }
 
 // read new lengths from settings
@@ -2607,6 +2636,66 @@ function completeSession() {
     ? "Focus session done. Time for a break."
     : "Break over. Ready to focus?";
   showToast(message);
+  notifySessionEnd(message);
+}
+
+// notifications
+
+// true when the browser allows notifications for this site
+function canNotify() {
+  return "Notification" in window && Notification.permission === "granted";
+}
+
+// ask for permission the first time the switch is turned on
+function toggleNotifications() {
+  if (focusSettings.notify && canNotify()) {
+    focusSettings.notify = false;
+    saveFocusSettings();
+    syncFocusSettingControls();
+    return;
+  }
+  if (!("Notification" in window)) {
+    showToast("This browser does not support notifications.", "error");
+    return;
+  }
+  if (Notification.permission === "denied") {
+    showToast("Notifications are blocked. Allow them for this site in your browser settings.", "error");
+    return;
+  }
+  Promise.resolve(Notification.requestPermission()).then(function (permission) {
+    focusSettings.notify = permission === "granted";
+    saveFocusSettings();
+    syncFocusSettingControls();
+    if (focusSettings.notify) {
+      showToast("Notifications on");
+    } else {
+      showToast("Notifications were not allowed.", "error");
+    }
+  });
+}
+
+// only when the page is in the background, the toast covers the rest
+function notifySessionEnd(message) {
+  if (!focusSettings.notify || !canNotify() || !document.hidden) {
+    return;
+  }
+  const options = { body: message, icon: "assets/icons/icon-192.png", tag: "hazfocus-timer" };
+  // phones only show notifications through the service worker
+  if ("serviceWorker" in navigator && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then(function (registration) {
+      registration.showNotification("HazFocus", options);
+    });
+    return;
+  }
+  try {
+    const note = new Notification("HazFocus", options);
+    note.onclick = function () {
+      window.focus();
+      note.close();
+    };
+  } catch (error) {
+    // some browsers only allow notifications from a service worker
+  }
 }
 
 // update the clock four times a second
@@ -2819,6 +2908,8 @@ function setupFocusListeners() {
     saveFocusSettings();
   });
 
+  notifySwitch.addEventListener("click", toggleNotifications);
+
   // get sound ready on the first click or key press, also after a reload
   document.addEventListener("pointerdown", unlockAudio);
   document.addEventListener("keydown", unlockAudio);
@@ -2885,6 +2976,26 @@ function handleShortcuts(event) {
 }
 
 // start the app
+// #focus in the address opens the timer
+function openFromHash() {
+  if (location.hash === "#focus") {
+    setView("focus");
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+}
+
+// install support and offline use, only works over http or https
+function registerServiceWorker() {
+  if (!("serviceWorker" in navigator) || !/^https?:$/.test(location.protocol)) {
+    return;
+  }
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {
+      // the app still works without it, just not offline
+    });
+  });
+}
+
 function init() {
   loadTheme();
   loadTasks();
@@ -2895,7 +3006,11 @@ function init() {
   setupEventListeners();
   setupFocusListeners();
   loadFocus();
+  // the focus timer shortcut from the installed app
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
   renderApp();
+  registerServiceWorker();
 
   // refresh dates when the user comes back to the tab,
   // so "due today" and "overdue" stay correct after midnight

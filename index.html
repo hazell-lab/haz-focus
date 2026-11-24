@@ -10,6 +10,8 @@
 
   <!-- favicon -->
   <link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
 
   <!-- google fonts: inter for the whole interface -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -178,7 +180,7 @@
           <button type="button" class="icon-btn" id="theme-btn" aria-label="switch to dark theme">
             <svg class="icon" aria-hidden="true"><use id="theme-icon" href="#i-moon"/></svg>
           </button>
-          <button type="button" class="btn btn-primary" id="add-task-btn" aria-label="add task" aria-keyshortcuts="n" title="New task (N)">
+          <button type="button" class="btn btn-primary" id="add-task-btn" aria-label="New task" aria-keyshortcuts="n" title="New task (N)">
             <svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>
             <span class="btn-text">New task</span>
           </button>
@@ -476,6 +478,15 @@
                 <p class="setting-desc">Play a soft chime when a session ends.</p>
               </div>
               <button type="button" class="switch on" id="sound-switch" role="switch" aria-checked="true" aria-label="chime when a session ends">
+                <span class="switch-knob"></span>
+              </button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <p class="setting-title">Notifications</p>
+                <p class="setting-desc" id="notify-desc">Show a notification when a session ends while HazFocus is in the background.</p>
+              </div>
+              <button type="button" class="switch" id="notify-switch" role="switch" aria-checked="false" aria-label="notify when a session ends" aria-describedby="notify-desc">
                 <span class="switch-knob"></span>
               </button>
             </div>

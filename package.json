@@ -1,0 +1,17 @@
+{
+  "name": "hazfocus",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A calm task and focus workspace built with plain HTML, CSS and JavaScript.",
+  "scripts": {
+    "start": "http-server . -p 4173 -c-1",
+    "test": "playwright test",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@playwright/test": "^1.49.1",
+    "http-server": "^14.1.1"
+  },
+  "license": "MIT"
+}
