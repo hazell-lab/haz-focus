@@ -1,10 +1,17 @@
-# runs the playwright tests on every push and pull request
+# runs the playwright tests on every push and pull request,
+# then publishes the site to github pages when main passes
 name: Tests
 
 on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+
+# only one deploy at a time, a newer push replaces a waiting one
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   test:
@@ -34,3 +41,34 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  deploy:
+    needs: test
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # only the files the app needs, no tests or node_modules
+      - name: Collect the site files
+        run: |
+          mkdir _site
+          cp -r index.html manifest.webmanifest sw.js css js assets _site/
+          touch _site/.nojekyll
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Publish to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

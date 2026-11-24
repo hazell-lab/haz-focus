@@ -20,7 +20,7 @@ async function openApp(page, saved = {}) {
     if (message.type() === "error") errors.push(message.text());
   });
 
-  await page.goto("/");
+  await page.goto("./");
   await expect(page.locator("#greeting-text")).not.toBeEmpty();
   return errors;
 }

@@ -1,5 +1,6 @@
 backups/
 netlify-deploy/
+_site/
 .vscode/
 .DS_Store
 Thumbs.db

@@ -6,10 +6,10 @@ const { openApp, goTo } = require("./helpers");
 test("the web app manifest is valid", async ({ page, request }) => {
   await openApp(page);
   const href = await page.locator('link[rel="manifest"]').getAttribute("href");
-  const manifest = await (await request.get("/" + href)).json();
+  const manifest = await (await request.get(href)).json();
   expect(manifest).toMatchObject({ name: "HazFocus", display: "standalone", start_url: "./" });
   for (const icon of manifest.icons) {
-    const response = await request.get("/" + icon.src);
+    const response = await request.get(icon.src);
     expect(response.ok(), icon.src).toBe(true);
   }
   expect(manifest.icons.some((icon) => icon.purpose === "maskable")).toBe(true);
@@ -32,7 +32,7 @@ test("the app opens offline after the first visit", async ({ page, context }) =>
 
 test("the focus shortcut opens the timer", async ({ page }) => {
   await openApp(page);
-  await page.goto("/#focus");
+  await page.goto("./#focus");
   await expect(page.locator("#focus-view")).toBeVisible();
 });
 

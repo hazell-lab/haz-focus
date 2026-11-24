@@ -4,7 +4,7 @@ A calm task and focus workspace built with plain HTML, CSS and JavaScript. Insta
 
 [![Tests](https://github.com/hazell-lab/haz-focus/actions/workflows/tests.yml/badge.svg)](https://github.com/hazell-lab/haz-focus/actions/workflows/tests.yml)
 
-**[🔗 Live Demo](https://productivity-app-hazim.netlify.app/)** · [Source code](https://github.com/hazell-lab/haz-focus) · [Portfolio](https://hazimaqil-portfolio.netlify.app)
+**[🔗 Live Demo](https://hazell-lab.github.io/haz-focus/)** · [Source code](https://github.com/hazell-lab/haz-focus) · [Portfolio](https://hazimaqil-portfolio.netlify.app)
 
 ![HazFocus dashboard with agenda, areas and the last 7 days](docs/screenshot.png)
 
@@ -107,7 +107,7 @@ Haz-Focus/
 4. Right-click `index.html` and choose **Open with Live Server**.
 5. The app opens in your browser at `http://127.0.0.1:5500`.
 
-You can also open `index.html` directly in a browser. Installing the app and offline use need it to be served over `http` or `https` (Live Server or Netlify), not opened as a file. An internet connection is needed for the Google Fonts the first time (the app falls back to system fonts without it).
+You can also open `index.html` directly in a browser. Installing the app and offline use need it to be served over `http` or `https` (Live Server or GitHub Pages), not opened as a file. An internet connection is needed for the Google Fonts the first time (the app falls back to system fonts without it).
 
 ## Testing
 
@@ -122,7 +122,11 @@ Locally the tests use your installed Google Chrome. On GitHub, the workflow in `
 
 ## Deploying
 
-The app is static, so there is no build step. On Netlify, set the publish directory to the project root and leave the build command empty. If you deploy by dragging a folder onto Netlify, include only `index.html`, `manifest.webmanifest`, `sw.js`, `css/`, `js/` and `assets/`, not `node_modules/`.
+The app is static, so there is no build step. It is hosted on **GitHub Pages**: after every push to `main`, the workflow in `.github/workflows/tests.yml` runs the tests and, only if they pass, publishes `index.html`, `manifest.webmanifest`, `sw.js`, `css/`, `js/` and `assets/` to [hazell-lab.github.io/haz-focus](https://hazell-lab.github.io/haz-focus/).
+
+To set it up on a fork, open **Settings → Pages** in the repository and set **Source** to **GitHub Actions**.
+
+All paths in the app are relative, so it works from a subfolder like `/haz-focus/`. To test a copy served from a folder, run the tests with `BASE_URL`, for example `BASE_URL=http://127.0.0.1:4174/haz-focus/ npm test`.
 
 ## Notes
 
